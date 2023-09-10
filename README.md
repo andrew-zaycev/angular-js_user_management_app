@@ -1,4 +1,5 @@
 # AngularJS User Management App
+- [DEMO LINK](https://64fe151a866787529f17bc17--zingy-sherbet-df741a.netlify.app/) <br>
 
 This project is a sample application built using AngularJS 1.8.3. The project includes a simple web application for managing a list of users.
 ## Dependencies
