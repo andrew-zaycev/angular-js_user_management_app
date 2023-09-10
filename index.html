@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="userManagementApp">
+<head>
+    <meta charset="UTF-8">
+    <title>AngularJS User Management App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-messages.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="services/UserApiService.service.js"></script>
+    <script src="js/controllers/UserController.js"></script>
+    <script src="js/directives/notification-popup.directive.js"></script>
+    <script src="js/directives/uniqueUsername.directive.js"></script>
+    <script src="js/directives/valid-email.directive.js"></script>
+    <script src="js/directives/match-password.directive.js"></script>
+    <script src="js/directives/valid-password.directive.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+</head>
+<body>
+<div ng-controller="UserController">
+    <section class="main-section">
+
+        <!-- notification popup -->
+        <notification-popup popup-class="popupClass" show-popup="showPopup" success-message="successMessage"></notification-popup>
+
+        <div class="main-section__table-wrapper">
+            <button class="main-section__button create-button" ng-click="showCreateForm()">Create User</button>
+            <div class="table-wrapper">
+                <table class="user-table">
+
+                <thead class="user-table__head">
+                <tr class="user-table__row user-table__row--header">
+                    <th>USERNAME</th>
+                    <th>FIRST NAME</th>
+                    <th>LAST NAME</th>
+                    <th>EMAIL</th>
+                    <th>TYPE</th>
+                </tr>
+                </thead>
+
+                <tbody class="table__body">
+                <tr ng-repeat="user in users" ng-click="editUser(user)">
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.firstName }}</td>
+                    <td>{{ user.lastName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.type }}</td>
+                </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+        <div class="main-section__create-user-form-wrapper">
+            <!-- Form for creating and editing a user -->
+            <div ng-show="isShowForm">
+                <form ng-submit="submitForm(userForm)" name="userForm" novalidate class="user-form">
+
+                    <div class="user-form__top-wrapper">
+                        <h2 class="user-form__title">Create New User</h2>
+                        <button type="button" ng-click="closeForm()" class="user-form__close-button">
+                            <img src="images/close.png" alt="close form" class="user-form__close-button-icon">
+                        </button>
+                    </div>
+
+                    <label for="username">Username*</label>
+                    <input type="text" id="username" ng-model="selectedUser.username" name="username" required unique-username class="user-form__input">
+                    <div ng-messages="userForm.username.$error" ng-show="userForm.username.$touched || userForm.$submitted || userForm.username.$dirty">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                        <div ng-message="uniqueUsername">
+                            <span class="error-text">This username is already taken</span>
+                        </div>
+                    </div>
+
+                    <label for="firstName">First name*</label>
+                    <input type="text" id="firstName" ng-model="selectedUser.firstName" name="firstName" required class="user-form__input">
+                    <div ng-messages="userForm.firstName.$error" ng-show="userForm.firstName.$touched || userForm.$submitted">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>                    </div>
+
+                    <label for="lastName">Last name*</label>
+                    <input type="text" id="lastName" ng-model="selectedUser.lastName" name="lastName" required class="user-form__input">
+                    <div ng-messages="userForm.lastName.$error" ng-show="userForm.lastName.$touched || userForm.$submitted">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                    </div>
+
+                    <label for="mail">Email*</label>
+                    <input placeholder="@" type="email" id="mail" ng-model="selectedUser.email" name="mail" required valid-email class="user-form__input">
+                    <div ng-messages="userForm.mail.$error" ng-show="userForm.mail.$dirty || userForm.mail.$touched || userForm.$submitted">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                        <div ng-message="validEmail">
+                            <span class="error-text">Please enter a valid email address</span>
+                        </div>
+                    </div>
+
+                    <label for="type" class="user-form__label-select">Type*</label>
+                    <select id="type" ng-model="selectedUser.type" name="type" required class="user-form__select">
+                        <option value="Admin">Admin</option>
+                        <option value="Driver">Driver</option>
+                    </select>
+                    <div ng-messages="userForm.type.$error" ng-show="userForm.type.$touched || userForm.$submitted || userForm.type.$dirty">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                    </div>
+
+                    <label for="password">Password*</label>
+                    <input type="password" id="password" name="password" ng-model="selectedUser.password" required password-validation class="user-form__input">
+                    <div ng-messages="userForm.password.$error" ng-show="userForm.password.$touched || userForm.$submitted || userForm.password.$dirty">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                        <div ng-message="passwordValidation" ng-show="userForm.password.$error.passwordValidation">
+                            <span class="error-text">The password must contain at least one number and one letter, and be at least 8 characters in length</span>
+                        </div>
+                    </div>
+
+                    <label for="repeatPassword">Repeat password*</label>
+                    <input type="password" id="repeatPassword" ng-model="selectedUser.repeatPassword" name="repeatPassword" required match-password="selectedUser.password" class="user-form__input">
+                    <div ng-messages="userForm.repeatPassword.$error" ng-show="userForm.repeatPassword.$dirty || userForm.repeatPassword.$touched || userForm.password.$dirty || userForm.$submitted">
+                        <div ng-message="required">
+                            <span class="error-text">This field is required</span>
+                        </div>
+                        <div ng-message="matchPassword">
+                            <span class="error-text">Password mismatch</span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons "Create", "Save" and "Delete" depending on the mode -->
+                    <button ng-if="isCreateMode" type="submit" class="main-section__button create-button">Create</button>
+                    <div class="user-form__button-wrapper">
+                        <button ng-if="isEditMode" ng-click="updateUser()" ng-disabled="userForm.$invalid" class="main-section__button create-button">Save</button>
+                        <button ng-if="isEditMode" ng-click="deleteUser()" class="main-section__button button--delete">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
