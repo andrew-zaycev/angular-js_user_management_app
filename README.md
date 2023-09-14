@@ -14,7 +14,7 @@ To run this project you will need the following software:
 1. Clone the repository on your computer:
 
    ```shell
-   git clone https://github.com/ваш-путь-к-репозиторию.git
+   git clone https://github.com/your-path-to-repository.git
 
 2. Open the index.html file in your web browser:
 
